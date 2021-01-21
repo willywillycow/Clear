@@ -18,6 +18,13 @@ index = False
 name = False
 extension = False
 target = False
+def empty(path):
+    for item in o.listdir(path):
+        if o.path.isfile(path+"/"+item):
+            o.remove(path+"/"+item)
+        elif o.path.isdir(path+"/"+item):
+            empty(path+"/"+item)
+            o.rmdir(path+"/"+item)
 ##########prompt##########
 print("Thanks for using clear!\nClear, created by Liansheng.\nOfficial website: https://sites.google.com/view/liansheng")
 ##########action##########
@@ -48,6 +55,7 @@ while True:
             print("------------------------------help------------------------------")
             for item in actions:
                 print(item)
+            print("\033[1m directory \033[0m equals to \033[1m *-DIRECTORY-* \033[0m")
             print("------------------------------end------------------------------")
 #####show clip#####
         if action == "show clip":
@@ -110,12 +118,10 @@ while True:
             if o.path.exists(path):
                 if o.path.isfile(path):
                     o.remove(path)
-                    print("Cleared.")
                 elif o.path.isdir(path):
-                    for item in o.listdir(path):
-                        o.remove(path+"/"+item)
+                    empty(path)
                     o.rmdir(path)
-                    print("Cleared.")
+                print("Cleared.")
             else:
                 print("Sorry, we could not find the path you have given, please check if you have written it correctly.")
 #####clear directory#####
@@ -125,8 +131,7 @@ while True:
                 if o.path.isfile(path):
                     print("Sorry, you need a directory in order to use this command, not a file.")
                 elif o.path.isdir(path):
-                    for item in o.listdir(path):
-                        o.remove(path+"/"+item)
+                    empty(path)
                     print("Cleared.")
             else:
                 print("Sorry, we could not find the path you have given, please check if you have written it correctly.")
@@ -134,13 +139,24 @@ while True:
         if action == "clear index":
             path = input("path: ")
             if o.path.exists(path):
-                index = input("index: ")
                 if o.path.isfile(path):
                     print("Sorry, you need a directory in order to use this command, not a file.")
                 elif o.path.isdir(path):
-                    directory = o.listdir(path)
-                    o.remove(path+"/"+directory[int(index)])
-                    print("Cleared.")
+                    index = input("index: ")
+                    try:
+                        index = int(index)
+                        if o.path.isdir(path):
+                            directory = o.listdir(path)
+                            if o.path.isfile(path+"/"+directory[index]):
+                                o.remove(path+"/"+directory[index])
+                            elif o.path.isdir(path+"/"+directory[index]):
+                                empty(path+"/"+directory[index])
+                                o.rmdir(path+"/"+directory[index])
+                            print("Cleared.")
+                        else:
+                            print("Sorry, your index is out of range.")
+                    except ValueError:
+                        print("Sorry, your input is invalid, please input integers.")
             else:
                 print("Sorry, we could not find the path you have given, please check if you have written it correctly.")
 #####clear extension#####
@@ -152,11 +168,21 @@ while True:
                 elif o.path.isdir(path):
                     target = input("target extension: ")
                     directory = o.listdir(path)
-                    for item in directory:
-                        name, extension = o.path.splitext(item)
-                        if extension.replace(".","") == target:
-                            o.remove(path+"/"+item)
-                    print("Cleared.")
+                    if target == "":
+                        print("Sorry, you need you input a extension type, not empty. If you want to delete directory then please enter \033[1m *-DIRECTORY-*.")
+                    else:
+                        if target == "*-DIRECTORY-*":
+                            for item in directory:
+                                if o.path.isdir(path+"/"+item):
+                                    empty(path+"/"+item)
+                                    o.rmdir(path+"/"+item)
+                        else:
+                            for item in directory:
+                                name, extension = o.path.splitext(item)
+                                if extension.replace(".","") == target:
+                                    print("test")
+                                    o.remove(path+"/"+item)
+                        print("Cleared.")
             else:
                 print("Sorry, we could not find the path you have given, please check if you have written it correctly.")
 #####detection#####
